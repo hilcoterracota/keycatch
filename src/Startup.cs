@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sampekey.Contex;
+using Sampekey.ModelContext;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace keycatch
@@ -26,6 +29,11 @@ namespace keycatch
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddIdentity<UserContext, RoleContext>()
+                 .AddEntityFrameworkStores<SampekeyDbContex>()
+                 .AddDefaultTokenProviders();
+
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -40,6 +48,11 @@ namespace keycatch
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+            }
+
+            using (SampekeyDbContex context = new SampekeyDbContex())
+            {
+                context.Database.EnsureCreated();//.Migrate();
             }
 
             app.UseHttpsRedirection();
