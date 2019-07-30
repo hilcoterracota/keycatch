@@ -7,7 +7,7 @@ namespace keycatch.interfaces
 {
     public interface IAccountRepository
     {
-        Task<IdentityResult> CreateAccount(SampekeyUserAccountRequest model);
-        Task<SignInResult> LoginAccount(SampekeyUserAccountRequest model);
+        Task<IdentityResult> CreateAccount(UserAccountRequest userAccountRequest);
+        Task<SignInResult> LoginAccount(UserAccountRequest userAccountRequest);
     }
 }

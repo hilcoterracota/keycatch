@@ -23,14 +23,7 @@ namespace keycatch.Contex
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (Environment.GetEnvironmentVariable("SQL_SAMPEKEY") != null)
-            {
-                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("SQL_SAMPEKEY"));
-            }
-            else if (Environment.GetEnvironmentVariable("PSQL_SAMPEKEY") != null)
-            {
-                optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("PSQL_SAMPEKEY"));
-            }
+            optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("SQL_SAMPEKEY"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

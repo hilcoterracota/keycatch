@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using keycatch.Contex;
 
 namespace keycatch.Controllers
 {
@@ -6,9 +7,14 @@ namespace keycatch.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        public AccountController() 
+        private readonly SampekeyDbContex contex;
+        public AccountController(SampekeyDbContex _contex) 
         {
-          
+          contex = _contex;
         }
+
+        [HttpGet]
+        public object Get() => contex.User;
+
     }
 }

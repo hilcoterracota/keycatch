@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace keycatch.Core
 {
-    public partial class SampekeyUserAccountRequest: IdentityUser
+    public partial class UserAccountRequest: IdentityUser
     {
         public string Password { get; set; }
     }
