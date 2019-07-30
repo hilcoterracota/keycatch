@@ -1,5 +1,10 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using keycatch.Contex;
+using Sampekey.Contex;
 
 namespace keycatch.Controllers
 {
@@ -7,14 +12,50 @@ namespace keycatch.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly SampekeyDbContex contex;
-        public AccountController(SampekeyDbContex _contex) 
+
+
+        private readonly SampekeyDbContex _contex;
+        private readonly ISampeKeyAccount _accountRepository;
+        public AccountController(
+            SampekeyDbContex contex,
+            ISampeKeyAccount accountRepository
+        )
         {
-          contex = _contex;
+            _contex = contex;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet]
-        public object Get() => contex.User;
+        public ActionResult<IEnumerable<object>> Get()
+        {
+            return _contex.User.ToList();
+        }
+
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<ActionResult<object>> Login([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _accountRepository.LoginAccount(userAccountRequest);
+                if (result.Succeeded)
+                {
+					return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(new{
+                        ModelState = ModelState,
+                        UserAccountRequest = userAccountRequest
+                    });
+                }
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
 
     }
 }
