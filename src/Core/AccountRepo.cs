@@ -24,14 +24,14 @@ namespace keycatch.Core
             signInManager = _signInManager;
         }
 
-        public Boolean LoginCnsfWithActiveDirectory(SampekeyUserAccountRequest userAccountRequest)
+        public Boolean LoginWithActiveDirectory(SampekeyUserAccountRequest userAccountRequest)
         {
             try
             {
                 using (var connection = new LdapConnection { SecureSocketLayer = false })
                 {
-                    connection.Connect("cnsf.gob.mx", 389);
-                    connection.Bind($"{userAccountRequest.UserName}@cnsf.gob.mx", userAccountRequest.Password);
+                    connection.Connect(Environment.GetEnvironmentVariable("AD_DDOMAIN"), int.Parse(Environment.GetEnvironmentVariable("AD_PORT")));
+                    connection.Bind($"{userAccountRequest.UserName}@{Environment.GetEnvironmentVariable("AD_DDOMAIN")}", userAccountRequest.Password);
                     return connection.Bound;
                 }
             }
@@ -41,7 +41,7 @@ namespace keycatch.Core
             }
         }
 
-        public Task<SignInResult> LoginCnsfWithSampeKey(SampekeyUserAccountRequest userAccountRequest)
+        public Task<SignInResult> LoginWithSampeKey(SampekeyUserAccountRequest userAccountRequest)
         {
             return signInManager.PasswordSignInAsync(userAccountRequest.UserName, userAccountRequest.Password, isPersistent: false, lockoutOnFailure: false);
         }

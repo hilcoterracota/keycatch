@@ -47,7 +47,7 @@ namespace keycatch.Controllers
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssageFromCnsfActiveDirectory());
+                return Unauthorized(systemRepo.GetUnauthorizedMenssageFromActiveDirectory());
             }
         }
 

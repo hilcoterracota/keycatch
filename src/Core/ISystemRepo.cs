@@ -5,12 +5,12 @@ namespace keycatch.Core
 {
     public class SystemRepo : ISystemRepo
     {
-        public Object GetUnauthorizedMenssageFromCnsfActiveDirectory()
+        public Object GetUnauthorizedMenssageFromActiveDirectory()
         {
             return new
             {
                 title = "Error de autenticación",
-                message = "No se ha podido autentificar ante el directorio activo de la CNSF. Por favor compruebe si las credenciales son correctas."
+                message = "No se ha podido autentificar ante el directorio activo. Por favor compruebe si las credenciales son correctas."
             };
         }
 

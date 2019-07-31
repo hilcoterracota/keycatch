@@ -8,8 +8,8 @@ namespace keycatch.Interfaces
 {
     public interface IAccountRepo
     {
-        Boolean LoginCnsfWithActiveDirectory(SampekeyUserAccountRequest userAccountRequest);
-        Task<SignInResult> LoginCnsfWithSampeKey(SampekeyUserAccountRequest userAccountRequest);
+        Boolean LoginWithActiveDirectory(SampekeyUserAccountRequest userAccountRequest);
+        Task<SignInResult> LoginWithSampeKey(SampekeyUserAccountRequest userAccountRequest);
         Task UpdateForcePaswordAsync(SampekeyUserAccountRequest userAccountRequest);
     }
 }

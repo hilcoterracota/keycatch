@@ -4,7 +4,7 @@ namespace keycatch.Interfaces
 {
     public interface ISystemRepo
     {
-        Object GetUnauthorizedMenssageFromCnsfActiveDirectory();
+        Object GetUnauthorizedMenssageFromActiveDirectory();
         Object GetUnauthorizedMenssageFromSampeKey();
         Object GetUnauthorizedMenssage();
         Object GetValidationProblemMenssage();
