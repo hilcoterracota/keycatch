@@ -30,9 +30,13 @@ namespace keycatch.Core
         {
             return await context.Role.ToListAsync();
         }
-        public Task<Role> FindRoleByName(Role role)
+        public Task<Role> FindRoleByName(string roleName)
         {
-            return roleManager.FindByNameAsync(role.Name);
+            return roleManager.FindByNameAsync(roleName);
+        }
+        public Task<Role> FindRoleById(string roleId)
+        {
+            return roleManager.FindByIdAsync(roleId);
         }
         public Task<IdentityResult> CreateRole(Role role)
         {

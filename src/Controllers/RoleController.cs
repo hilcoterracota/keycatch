@@ -1,10 +1,8 @@
 
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using keycatch.Interfaces;
-using Sampekey.Contex;
 using Sampekey.Model;
 
 namespace keycatch.Controllers
@@ -40,8 +38,9 @@ namespace keycatch.Controllers
             {
                 if ((await roleRepo.CreateRole(role)).Succeeded)
                 {
-                    return Ok((await roleRepo.FindRoleByName(role)));
-                }else
+                    return Ok((await roleRepo.FindRoleByName(role.Name)));
+                }
+                else
                 {
                     return ValidationProblem();
                 }
@@ -52,6 +51,25 @@ namespace keycatch.Controllers
             }
         }
 
-
+        [HttpPost]
+        [Route("V1/AddClaimToRole")]
+        public async Task<ActionResult<Role>> AddClaimToRole([FromBody] RoleClaim roleClaim)
+        {
+            if (ModelState.IsValid)
+            {
+                if ((await roleRepo.AddClaimAsyncToRole(await roleRepo.FindRoleById(roleClaim.RoleId), roleClaim.ToClaim())).Succeeded)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return ValidationProblem();
+            }
+        }
     }
 }

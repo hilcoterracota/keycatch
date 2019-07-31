@@ -50,11 +50,20 @@ namespace keycatch.Controllers
                 {
                     userAccountRequest.Email = user_found.Email;
                     await accountRepo.UpdateForcePaswordAsync(userAccountRequest);
+
+                    var roles_user = await userRepo.GetRolesFromUser(user_found);
+                    
+                    IList<object> claims_roles =  new List<object>();
+                    foreach (var roleName in roles_user)
+                    {
+                        claims_roles.Add(await roleRepo.GetClaimsFromRole(await roleRepo.FindRoleByName(roleName)));
+                    }
+
                     return Ok(new
                     {
                         User = user_found,
-                        Roles = await userRepo.GetRolesFromUser(user_found),
-                        Claims = await userRepo.GetClaimsFromUser(user_found),
+                        Roles = roles_user,
+                        Claims = claims_roles,
                         Token = sampeKeyAccount.CreateToken(userAccountRequest)
                     });
                 }
@@ -102,11 +111,19 @@ namespace keycatch.Controllers
                 if ((await accountRepo.LoginCnsfWithSampeKey(userAccountRequest)).Succeeded)
                 {
                     userAccountRequest.Email = user_found.Email;
+                    var roles_user = await userRepo.GetRolesFromUser(user_found);
+                    
+                    IList<object> claims_roles =  new List<object>();
+                    foreach (var roleName in roles_user)
+                    {
+                        claims_roles.Add(await roleRepo.GetClaimsFromRole(await roleRepo.FindRoleByName(roleName)));
+                    }
+
                     return Ok(new
                     {
                         User = user_found,
-                        Roles = await userRepo.GetRolesFromUser(user_found),
-                        Claims = await userRepo.GetClaimsFromUser(user_found),
+                        Roles = roles_user,
+                        Claims = claims_roles,
                         Token = sampeKeyAccount.CreateToken(userAccountRequest)
                     });
                 }
