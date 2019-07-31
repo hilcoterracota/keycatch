@@ -1,10 +1,11 @@
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using keycatch.Interfaces;
 using Sampekey.Contex;
+using Sampekey.Model;
 
 namespace keycatch.Controllers
 {
@@ -12,48 +13,44 @@ namespace keycatch.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-
-
-        private readonly SampekeyDbContex _contex;
-        private readonly ISampeKeyAccount _accountRepository;
+        private readonly IAccountRepo accountRepo;
+        private readonly IUserRepo userRepo;
+        private readonly ISystemRepo systemRepo;
         public AccountController(
-            SampekeyDbContex contex,
-            ISampeKeyAccount accountRepository
+            IAccountRepo _accountRepo,
+            IUserRepo _userRepo,
+            ISystemRepo _systemRepo
         )
         {
-            _contex = contex;
-            _accountRepository = accountRepository;
+            accountRepo = _accountRepo;
+            userRepo = _userRepo;
+            systemRepo = _systemRepo;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<object>> Get()
         {
-            return _contex.User.ToList();
+            return Ok(userRepo.GetAllUsers());
         }
 
-
         [HttpPost]
-        [Route("Login")]
-        public async Task<ActionResult<object>> Login([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        [Route("V1/LoginWithCnsfActiveDirectory")]
+        public async Task<ActionResult<User>> LoginWithCnsfActiveDirectory([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && accountRepo.LoginCnsfWithActiveDirectory(userAccountRequest))
             {
-                var result = await _accountRepository.LoginAccount(userAccountRequest);
-                if (result.Succeeded)
+                var user_found = await userRepo.FindUserByUserName(userAccountRequest);
+                if (user_found != null)
                 {
-					return Ok(result);
-                }
-                else
+                    return Ok(user_found);
+                }else
                 {
-                    return BadRequest(new{
-                        ModelState = ModelState,
-                        UserAccountRequest = userAccountRequest
-                    });
+                    return Unauthorized(systemRepo.GetUnauthorizedMenssageFromSampeKey());
                 }
             }
             else
             {
-                return BadRequest(ModelState);
+                return Unauthorized(systemRepo.GetUnauthorizedMenssageFromCnsfActiveDirectory());
             }
         }
 
