@@ -6,6 +6,7 @@ using Sampekey.Model;
 using Sampekey.Contex;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace keycatch.Core
 {
@@ -28,11 +29,6 @@ namespace keycatch.Core
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             return await context.User
-                .Include(i => i.Status)
-                .Include(i => i.UserRoles)
-                    .ThenInclude(i => i.Role)
-                        .ThenInclude(i => i.RoleClaims)
-                .Include(i => i.UserTokens)
             .ToListAsync();
         }
 
@@ -40,20 +36,24 @@ namespace keycatch.Core
             return userManager.FindByNameAsync(userAccountRequest.UserName);
         }
 
-        public async Task<bool> CreateUser(SampekeyUserAccountRequest userAccountRequest)
+        public Task<IdentityResult> CreateUser(SampekeyUserAccountRequest userAccountRequest)
         {
-            try
-            {
-                await Task.WhenAll(
-                    userManager.CreateAsync(userAccountRequest, userAccountRequest.Password),
-                    userManager.CreateSecurityTokenAsync(userAccountRequest)
-                );
-                return true;
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
+            return userManager.CreateAsync(userAccountRequest, userAccountRequest.Password);
+        }
+
+        public Task<IdentityResult> AddDefaultRoleToUser(User user)
+        {
+            return userManager.AddToRoleAsync(user, "default");
+        }
+
+        public Task<IList<string>> GetRolesFromUser(User user)
+        {
+            return userManager.GetRolesAsync(user);
+        }
+
+        public Task<IList<Claim>> GetClaimsFromUser(User user)
+        {
+            return userManager.GetClaimsAsync(user);
         }
 
     }

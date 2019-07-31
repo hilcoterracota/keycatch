@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Sampekey.Model;
 using Sampekey.Contex;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace keycatch.Interfaces
 {
@@ -10,7 +12,10 @@ namespace keycatch.Interfaces
     {
         Task<IEnumerable<User>> GetAllUsers();
         Task<User> FindUserByUserName(SampekeyUserAccountRequest userAccountRequest);
-        Task<bool> CreateUser(SampekeyUserAccountRequest userAccountRequest);
+        Task<IdentityResult> CreateUser(SampekeyUserAccountRequest userAccountRequest);
+        Task<IdentityResult> AddDefaultRoleToUser(User user);
+        Task<IList<Claim>> GetClaimsFromUser(User user);
+        Task<IList<string>> GetRolesFromUser(User user);
     }
 }
 

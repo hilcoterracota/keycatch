@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Sampekey.Contex;
 using Sampekey.Model;
+using Sampekey.Clases;
 using keycatch.Interfaces;
 using keycatch.Core;
 
@@ -29,9 +30,11 @@ namespace keycatch
             .AddEntityFrameworkStores<SampekeyDbContex>()
             .AddDefaultTokenProviders();
 
+            services.AddTransient<ISampeKeyAccount, SampeKeyAccount>();
             services.AddTransient<IAccountRepo, AccountRepo>();
             services.AddTransient<IUserRepo, UserRepo>();
             services.AddTransient<ISystemRepo, SystemRepo>();
+            services.AddTransient<IRoleRepo, RoleRepo>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

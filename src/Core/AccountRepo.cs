@@ -41,34 +41,16 @@ namespace keycatch.Core
             }
         }
 
-        public async Task<Boolean> LoginCnsfWithSampeKey(SampekeyUserAccountRequest userAccountRequest)
+        public Task<SignInResult> LoginCnsfWithSampeKey(SampekeyUserAccountRequest userAccountRequest)
         {
-            if ((await signInManager.PasswordSignInAsync(userAccountRequest.Email, userAccountRequest.Password, isPersistent: false, lockoutOnFailure: false)).Succeeded)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return signInManager.PasswordSignInAsync(userAccountRequest.UserName, userAccountRequest.Password, isPersistent: false, lockoutOnFailure: false);
         }
 
-        public async Task<Boolean> CreateUser(SampekeyUserAccountRequest userAccountRequest)
+        public async Task UpdateForcePaswordAsync(SampekeyUserAccountRequest userAccountRequest)
         {
-            try
-            {
-                await Task.WhenAll(
-                    userManager.CreateAsync(userAccountRequest, userAccountRequest.Password),
-                    userManager.CreateSecurityTokenAsync(userAccountRequest)
-                );
-                return true;
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
-        } 
-
+            await userManager.RemovePasswordAsync(userAccountRequest);
+            await userManager.AddPasswordAsync(userAccountRequest, userAccountRequest.Password);
+        }
 
     }
 }

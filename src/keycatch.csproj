@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.6" />
     <PackageReference Include="Novell.Directory.Ldap.NETStandard" Version="2.3.8" />
-    <PackageReference Include="Sampekey" Version="1.2.0" />
+    <PackageReference Include="Sampekey" Version="1.2.1" />
   </ItemGroup>
 
 </Project>

@@ -15,16 +15,22 @@ namespace keycatch.Controllers
     {
         private readonly IAccountRepo accountRepo;
         private readonly IUserRepo userRepo;
+        private readonly IRoleRepo roleRepo;
         private readonly ISystemRepo systemRepo;
+        private readonly ISampeKeyAccount sampeKeyAccount;
         public AccountController(
             IAccountRepo _accountRepo,
             IUserRepo _userRepo,
-            ISystemRepo _systemRepo
+            IRoleRepo _roleRepo,
+            ISystemRepo _systemRepo,
+            ISampeKeyAccount _sampeKeyAccount
         )
         {
             accountRepo = _accountRepo;
             userRepo = _userRepo;
+            roleRepo = _roleRepo;
             systemRepo = _systemRepo;
+            sampeKeyAccount = _sampeKeyAccount;
         }
 
         [HttpGet]
@@ -42,10 +48,41 @@ namespace keycatch.Controllers
                 var user_found = await userRepo.FindUserByUserName(userAccountRequest);
                 if (user_found != null)
                 {
-                    return Ok(user_found);
-                }else
+                    userAccountRequest.Email = user_found.Email;
+                    await accountRepo.UpdateForcePaswordAsync(userAccountRequest);
+                    return Ok(new
+                    {
+                        User = user_found,
+                        Roles = await userRepo.GetRolesFromUser(user_found),
+                        Claims = await userRepo.GetClaimsFromUser(user_found),
+                        Token = sampeKeyAccount.CreateToken(userAccountRequest)
+                    });
+                }
+                else
                 {
-                    return Unauthorized(systemRepo.GetUnauthorizedMenssageFromSampeKey());
+                    userAccountRequest.Email = userAccountRequest.UserName+"@cnsf.gob.mx";
+                    if ((await userRepo.CreateUser(userAccountRequest)).Succeeded)
+                    {
+                        var new_user = await userRepo.FindUserByUserName(userAccountRequest);
+                        if ((await userRepo.AddDefaultRoleToUser(new_user)).Succeeded)
+                        {
+                            return Ok(new
+                            {
+                                User = new_user,
+                                Roles = await userRepo.GetRolesFromUser(new_user),
+                                Claims = await userRepo.GetClaimsFromUser(new_user),
+                                Token = sampeKeyAccount.CreateToken(userAccountRequest)
+                            });
+                        }
+                        else
+                        {
+                            return ValidationProblem();
+                        }
+                    }
+                    else
+                    {
+                        return ValidationProblem();
+                    }
                 }
             }
             else
@@ -56,16 +93,24 @@ namespace keycatch.Controllers
 
         [HttpPost]
         [Route("V1/LoginWithSampeKey")]
-        public async Task<ActionResult> LoginWithSampeKey([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        public async Task<ActionResult<User>> LoginWithSampeKey([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
             var user_found = await userRepo.FindUserByUserName(userAccountRequest);
 
             if (ModelState.IsValid && user_found != null)
             {
-                if ((accountRepo.LoginCnsfWithSampeKey(userAccountRequest).IsCompletedSuccessfully))
+                if ((await accountRepo.LoginCnsfWithSampeKey(userAccountRequest)).Succeeded)
                 {
-                    return Ok(user_found);
-                }else
+                    userAccountRequest.Email = user_found.Email;
+                    return Ok(new
+                    {
+                        User = user_found,
+                        Roles = await userRepo.GetRolesFromUser(user_found),
+                        Claims = await userRepo.GetClaimsFromUser(user_found),
+                        Token = sampeKeyAccount.CreateToken(userAccountRequest)
+                    });
+                }
+                else
                 {
                     return Unauthorized(systemRepo.GetUnauthorizedMenssage());
                 }
@@ -78,11 +123,26 @@ namespace keycatch.Controllers
 
         [HttpPost]
         [Route("V1/CreateUser")]
-        public async Task<ActionResult> CreateUser([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        public async Task<ActionResult<User>> CreateUser([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
             if (ModelState.IsValid)
             {
-                return Ok();
+                if ((await userRepo.CreateUser(userAccountRequest)).Succeeded)
+                {
+                    var new_user = await userRepo.FindUserByUserName(userAccountRequest);
+                    if ((await userRepo.AddDefaultRoleToUser(new_user)).Succeeded)
+                    {
+                        return Ok(new_user);
+                    }
+                    else
+                    {
+                        return ValidationProblem();
+                    }
+                }
+                else
+                {
+                    return ValidationProblem();
+                }
             }
             else
             {
