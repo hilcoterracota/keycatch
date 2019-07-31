@@ -10,6 +10,7 @@ namespace keycatch.Interfaces
     {
         Task<IEnumerable<User>> GetAllUsers();
         Task<User> FindUserByUserName(SampekeyUserAccountRequest userAccountRequest);
+        Task<bool> CreateUser(SampekeyUserAccountRequest userAccountRequest);
     }
 }
 

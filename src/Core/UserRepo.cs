@@ -24,6 +24,7 @@ namespace keycatch.Core
             userManager = _userManager;
             signInManager = _signInManager;
         }
+
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             return await context.User
@@ -37,6 +38,22 @@ namespace keycatch.Core
 
         public Task<User> FindUserByUserName(SampekeyUserAccountRequest userAccountRequest){
             return userManager.FindByNameAsync(userAccountRequest.UserName);
+        }
+
+        public async Task<bool> CreateUser(SampekeyUserAccountRequest userAccountRequest)
+        {
+            try
+            {
+                await Task.WhenAll(
+                    userManager.CreateAsync(userAccountRequest, userAccountRequest.Password),
+                    userManager.CreateSecurityTokenAsync(userAccountRequest)
+                );
+                return true;
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
         }
 
     }

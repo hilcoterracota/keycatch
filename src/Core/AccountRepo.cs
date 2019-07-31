@@ -41,6 +41,18 @@ namespace keycatch.Core
             }
         }
 
+        public async Task<Boolean> LoginCnsfWithSampeKey(SampekeyUserAccountRequest userAccountRequest)
+        {
+            if ((await signInManager.PasswordSignInAsync(userAccountRequest.Email, userAccountRequest.Password, isPersistent: false, lockoutOnFailure: false)).Succeeded)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<Boolean> CreateUser(SampekeyUserAccountRequest userAccountRequest)
         {
             try

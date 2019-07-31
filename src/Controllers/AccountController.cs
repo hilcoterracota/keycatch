@@ -54,5 +54,41 @@ namespace keycatch.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("V1/LoginWithSampeKey")]
+        public async Task<ActionResult> LoginWithSampeKey([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        {
+            var user_found = await userRepo.FindUserByUserName(userAccountRequest);
+
+            if (ModelState.IsValid && user_found != null)
+            {
+                if ((accountRepo.LoginCnsfWithSampeKey(userAccountRequest).IsCompletedSuccessfully))
+                {
+                    return Ok(user_found);
+                }else
+                {
+                    return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                }
+            }
+            else
+            {
+                return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+            }
+        }
+
+        [HttpPost]
+        [Route("V1/CreateUser")]
+        public async Task<ActionResult> CreateUser([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        {
+            if (ModelState.IsValid)
+            {
+                return Ok();
+            }
+            else
+            {
+                return ValidationProblem();
+            }
+        }
+
     }
 }

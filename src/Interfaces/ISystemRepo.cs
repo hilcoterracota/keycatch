@@ -6,7 +6,8 @@ namespace keycatch.Interfaces
     {
         Object GetUnauthorizedMenssageFromCnsfActiveDirectory();
         Object GetUnauthorizedMenssageFromSampeKey();
-
+        Object GetUnauthorizedMenssage();
+        Object GetValidationProblemMenssage();
     }
 }
 
