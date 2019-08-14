@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using keycatch.Interfaces;
 using Sampekey.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace keycatch.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class RoleController : ControllerBase
     {
         private readonly ISystemRepo systemRepo;

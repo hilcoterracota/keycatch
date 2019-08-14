@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using keycatch.Interfaces;
 using Sampekey.Contex;
 using Sampekey.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace keycatch.Controllers
 {
@@ -17,20 +19,17 @@ namespace keycatch.Controllers
         private readonly IUserRepo userRepo;
         private readonly IRoleRepo roleRepo;
         private readonly ISystemRepo systemRepo;
-        private readonly ISampeKeyAccount sampeKeyAccount;
         public AccountController(
             IAccountRepo _accountRepo,
             IUserRepo _userRepo,
             IRoleRepo _roleRepo,
-            ISystemRepo _systemRepo,
-            ISampeKeyAccount _sampeKeyAccount
+            ISystemRepo _systemRepo
         )
         {
             accountRepo = _accountRepo;
             userRepo = _userRepo;
             roleRepo = _roleRepo;
             systemRepo = _systemRepo;
-            sampeKeyAccount = _sampeKeyAccount;
         }
 
         [HttpGet]
@@ -64,7 +63,7 @@ namespace keycatch.Controllers
                         User = user_found,
                         Roles = roles_user,
                         Claims = claims_roles,
-                        Token = sampeKeyAccount.CreateToken(userAccountRequest)
+                        Token = SampekeyParams.CreateToken(userAccountRequest)
                     });
                 }
                 else
@@ -80,7 +79,7 @@ namespace keycatch.Controllers
                                 User = new_user,
                                 Roles = await userRepo.GetRolesFromUser(new_user),
                                 Claims = await userRepo.GetClaimsFromUser(new_user),
-                                Token = sampeKeyAccount.CreateToken(userAccountRequest)
+                                Token = SampekeyParams.CreateToken(userAccountRequest)
                             });
                         }
                         else
@@ -124,7 +123,7 @@ namespace keycatch.Controllers
                         User = user_found,
                         Roles = roles_user,
                         Claims = claims_roles,
-                        Token = sampeKeyAccount.CreateToken(userAccountRequest)
+                        Token = SampekeyParams.CreateToken(userAccountRequest)
                     });
                 }
                 else
@@ -140,6 +139,7 @@ namespace keycatch.Controllers
 
         [HttpPost]
         [Route("V1/CreateUser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<User>> CreateUser([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
             if (ModelState.IsValid)
@@ -164,6 +164,24 @@ namespace keycatch.Controllers
             else
             {
                 return ValidationProblem();
+            }
+        }
+
+        [HttpPost]
+        [Route("V1/GeneratePermanentToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public ActionResult<User> GeneratePermanentToken([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        {
+            if (ModelState.IsValid)
+            {
+                return Ok(new
+                {
+                    Token = SampekeyParams.CreateToken(userAccountRequest)
+                });
+            }
+            else
+            {
+                return Unauthorized(systemRepo.GetUnauthorizedMenssage());
             }
         }
 
