@@ -1,7 +1,7 @@
 pipeline {
     agent any
     stages {
-        dir ("\"${WORKSPACE}\\src") { 
+        dir ("src") { 
             stage('Build') {
                 steps {
                     echo 'Building..'
