@@ -4,6 +4,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
+                bat "cd src"
                 bat "\"C:/Program Files/dotnet/dotnet.exe\" restore"
                 bat "\"C:/Program Files/dotnet/dotnet.exe\" build"
             }
