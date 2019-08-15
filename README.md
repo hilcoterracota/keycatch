@@ -16,6 +16,7 @@
 
 Nota: Si se usa el sistema gateway las variables de entorno deben coincidir
 
-## Implementación IIS:
+### Para implementación en IIS:
+- [net core hosting >= 2.2.6](https://dotnet.microsoft.com/download)
 
 ## Implementación Docker:
