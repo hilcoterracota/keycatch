@@ -139,7 +139,6 @@ namespace keycatch.Controllers
 
         [HttpPost]
         [Route("V1/CreateUser")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<User>> CreateUser([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
             if (ModelState.IsValid)
@@ -169,7 +168,6 @@ namespace keycatch.Controllers
 
         [HttpPost]
         [Route("V1/GeneratePermanentToken")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult<User> GeneratePermanentToken([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
             if (ModelState.IsValid)

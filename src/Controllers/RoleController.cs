@@ -11,7 +11,6 @@ namespace keycatch.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class RoleController : ControllerBase
     {
         private readonly ISystemRepo systemRepo;
