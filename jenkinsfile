@@ -16,8 +16,8 @@ pipeline {
       }
     }
     stage('Deploy') {
-      dir("src"){
-        steps {
+      steps {
+        dir("src"){
           echo 'Deploying....'
           bat "\"C:/Program Files/dotnet/dotnet.exe\" publish"
         }
