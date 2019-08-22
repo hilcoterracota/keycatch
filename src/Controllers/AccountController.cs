@@ -49,20 +49,9 @@ namespace keycatch.Controllers
                 {
                     userAccountRequest.Email = user_found.Email;
                     await accountRepo.UpdateForcePaswordAsync(userAccountRequest);
-
-                    var roles_user = await userRepo.GetRolesFromUser(user_found);
-                    
-                    IList<object> claims_roles =  new List<object>();
-                    foreach (var roleName in roles_user)
-                    {
-                        claims_roles.Add(await roleRepo.GetClaimsFromRole(await roleRepo.FindRoleByName(roleName)));
-                    }
-
                     return Ok(new
                     {
                         User = user_found,
-                        Roles = roles_user,
-                        Claims = claims_roles,
                         Token = SampekeyParams.CreateToken(userAccountRequest)
                     });
                 }
@@ -77,8 +66,7 @@ namespace keycatch.Controllers
                             return Ok(new
                             {
                                 User = new_user,
-                                Roles = await userRepo.GetRolesFromUser(new_user),
-                                Claims = await userRepo.GetClaimsFromUser(new_user),
+                                Roles = userRepo.GetRolesFromUser(user_found),
                                 Token = SampekeyParams.CreateToken(userAccountRequest)
                             });
                         }
@@ -109,20 +97,9 @@ namespace keycatch.Controllers
             {
                 if ((await accountRepo.LoginWithSampeKey(userAccountRequest)).Succeeded)
                 {
-                    userAccountRequest.Email = user_found.Email;
-                    var roles_user = await userRepo.GetRolesFromUser(user_found);
-                    
-                    IList<object> claims_roles =  new List<object>();
-                    foreach (var roleName in roles_user)
-                    {
-                        claims_roles.Add(await roleRepo.GetClaimsFromRole(await roleRepo.FindRoleByName(roleName)));
-                    }
-
                     return Ok(new
                     {
                         User = user_found,
-                        Roles = roles_user,
-                        Claims = claims_roles,
                         Token = SampekeyParams.CreateToken(userAccountRequest)
                     });
                 }
