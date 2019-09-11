@@ -38,6 +38,13 @@ namespace keycatch.Controllers
             return Ok(userRepo.GetAllUsers());
         }
 
+        [HttpGet]
+        [Route("V1/GetUsersWithActiveDirectory")]
+        public HashSet<string> GetUsersWithActiveDirectory([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        {
+            return accountRepo.GetUsersWithActiveDirectory(userAccountRequest);
+        }
+
         [HttpPost]
         [Route("V1/LoginWithActiveDirectory")]
         public async Task<ActionResult<User>> LoginWithActiveDirectory([FromBody] SampekeyUserAccountRequest userAccountRequest)

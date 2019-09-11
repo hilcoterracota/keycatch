@@ -11,6 +11,7 @@ namespace keycatch.Interfaces
         Boolean LoginWithActiveDirectory(SampekeyUserAccountRequest userAccountRequest);
         Task<SignInResult> LoginWithSampeKey(SampekeyUserAccountRequest userAccountRequest);
         Task UpdateForcePaswordAsync(SampekeyUserAccountRequest userAccountRequest);
+        HashSet<string> GetUsersWithActiveDirectory(SampekeyUserAccountRequest userAccountRequest);
     }
 }
 
