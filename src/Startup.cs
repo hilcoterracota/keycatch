@@ -6,9 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Sampekey.Contex;
-using Sampekey.Model;
-using keycatch.Interfaces;
-using keycatch.Core;
+using Sampekey.Model.Identity;
+using Sampekey.Interface;
+using Sampekey.Interface.Repository;
 
 namespace keycatch
 {
@@ -34,10 +34,16 @@ namespace keycatch
             options.TokenValidationParameters = SampekeyParams.GetTokenValidationParameters());
             services.AddMvc().AddJsonOptions(ConfigureJson);
 
-            services.AddTransient<IAccountRepo, AccountRepo>();
-            services.AddTransient<IUserRepo, UserRepo>();
-            services.AddTransient<ISystemRepo, SystemRepo>();
-            services.AddTransient<IRoleRepo, RoleRepo>();
+            services.AddTransient<IAccount, AccountRepo>();
+            services.AddTransient<IEnviroment, EnviromentRepo>();
+            services.AddTransient<IKingdomCastleRolePermission, KingdomCastleRolePermissionRepo>();
+            services.AddTransient<IModule, ModuleRepo>();
+            services.AddTransient<IPermission, PermissionRepo>();
+            services.AddTransient<IRole, RoleRepo>();
+            services.AddTransient<ISystem, SystemRepo>();
+            services.AddTransient<ISystemAlert, SystemAlertRepo>();
+            services.AddTransient<ISystemModule, SystemModuleRepo>();
+            services.AddTransient<IUser, UserRepo>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

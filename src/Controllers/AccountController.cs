@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using keycatch.Interfaces;
+using Sampekey.Interface;
+using Sampekey.Model.Identity;
 using Sampekey.Contex;
-using Sampekey.Model;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace keycatch.Controllers
 {
@@ -15,21 +13,21 @@ namespace keycatch.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountRepo accountRepo;
-        private readonly IUserRepo userRepo;
-        private readonly IRoleRepo roleRepo;
-        private readonly ISystemRepo systemRepo;
+        private readonly IAccount accountRepo;
+        private readonly IUser userRepo;
+        private readonly IRole roleRepo;
+        private readonly ISystemAlert systemAlertRepo;
         public AccountController(
-            IAccountRepo _accountRepo,
-            IUserRepo _userRepo,
-            IRoleRepo _roleRepo,
-            ISystemRepo _systemRepo
+            IAccount _accountRepo,
+            IUser _userRepo,
+            IRole _roleRepo,
+            ISystemAlert _systemAlertRepo
         )
         {
             accountRepo = _accountRepo;
             userRepo = _userRepo;
             roleRepo = _roleRepo;
-            systemRepo = _systemRepo;
+            systemAlertRepo = _systemAlertRepo;
         }
 
         [HttpGet]
@@ -90,7 +88,7 @@ namespace keycatch.Controllers
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssageFromActiveDirectory());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssageFromActiveDirectory());
             }
         }
 
@@ -112,12 +110,12 @@ namespace keycatch.Controllers
                 }
                 else
                 {
-                    return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                    return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
                 }
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
             }
         }
 
@@ -163,7 +161,7 @@ namespace keycatch.Controllers
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
             }
         }
 

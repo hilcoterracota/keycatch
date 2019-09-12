@@ -1,11 +1,8 @@
 
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using keycatch.Interfaces;
-using Sampekey.Model;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Sampekey.Interface;
+using Sampekey.Model.Identity;
 
 namespace keycatch.Controllers
 {
@@ -13,19 +10,19 @@ namespace keycatch.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private readonly ISystemRepo systemRepo;
-        private readonly IRoleRepo roleRepo;
+        private readonly ISystemAlert systemAlertRepo;
+        private readonly IRole roleRepo;
         public RoleController(
-            ISystemRepo _systemRepo,
-            IRoleRepo _roleRepo
+            ISystemAlert _systemAlertRepo,
+            IRole _roleRepo
         )
         {
-            systemRepo = _systemRepo;
+            systemAlertRepo = _systemAlertRepo;
             roleRepo = _roleRepo;
         }
 
         [HttpGet]
-        [Route("V1/GetRoles")]
+        [Route("V1")]
         public async Task<ActionResult<Role>> GetRoles()
         {
             return Ok(await roleRepo.GetRoles());
@@ -49,7 +46,7 @@ namespace keycatch.Controllers
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssageFromActiveDirectory());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssageFromActiveDirectory());
             }
         }
 
