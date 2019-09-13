@@ -26,10 +26,10 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        [Route("V1/search")]
-        public ActionResult<CastleLand> FindCastleLandById([FromBody] CastleLand value)
+        [Route("V1/{id}:string")]
+        public ActionResult<CastleLand> FindCastleLandById(string id)
         {
-            return Ok(systemModule.FindCastleLandById(value));
+            return Ok(systemModule.FindCastleLandById(id));
         }
 
         [HttpPost]

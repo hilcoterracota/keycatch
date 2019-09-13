@@ -31,7 +31,7 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<object>> Get()
+        public ActionResult<IEnumerable<User>> Get()
         {
             return Ok(userRepo.GetAllUsers());
         }
@@ -49,7 +49,7 @@ namespace keycatch.Controllers
         {
             if (ModelState.IsValid && accountRepo.LoginWithActiveDirectory(userAccountRequest))
             {
-                var user_found = await userRepo.FindUserByUserName(userAccountRequest);
+                var user_found = await accountRepo.FindUserByUserName(userAccountRequest);
                 if (user_found != null)
                 {
                     userAccountRequest.Email = user_found.Email;
@@ -63,15 +63,15 @@ namespace keycatch.Controllers
                 else
                 {
                     userAccountRequest.Email = $"{userAccountRequest.UserName}@{Environment.GetEnvironmentVariable("AD_DDOMAIN")}";
-                    if ((await userRepo.CreateUser(userAccountRequest)).Succeeded)
+                    if ((await accountRepo.CreateUser(userAccountRequest)).Succeeded)
                     {
-                        var new_user = await userRepo.FindUserByUserName(userAccountRequest);
-                        if ((await userRepo.AddDefaultRoleToUser(new_user)).Succeeded)
+                        var new_user = await accountRepo.FindUserByUserName(userAccountRequest);
+                        if ((await accountRepo.AddDefaultRoleToUser(new_user)).Succeeded)
                         {
                             return Ok(new
                             {
                                 User = new_user,
-                                Roles = userRepo.GetRolesFromUser(user_found),
+                                Roles = accountRepo.GetRolesFromUser(user_found),
                                 Token = SampekeyParams.CreateToken(userAccountRequest)
                             });
                         }
@@ -96,7 +96,7 @@ namespace keycatch.Controllers
         [Route("V1/LoginWithSampeKey")]
         public async Task<ActionResult<User>> LoginWithSampeKey([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
-            var user_found = await userRepo.FindUserByUserName(userAccountRequest);
+            var user_found = await accountRepo.FindUserByUserName(userAccountRequest);
 
             if (ModelState.IsValid && user_found != null)
             {
@@ -125,10 +125,10 @@ namespace keycatch.Controllers
         {
             if (ModelState.IsValid)
             {
-                if ((await userRepo.CreateUser(userAccountRequest)).Succeeded)
+                if ((await accountRepo.CreateUser(userAccountRequest)).Succeeded)
                 {
-                    var new_user = await userRepo.FindUserByUserName(userAccountRequest);
-                    if ((await userRepo.AddDefaultRoleToUser(new_user)).Succeeded)
+                    var new_user = await accountRepo.FindUserByUserName(userAccountRequest);
+                    if ((await accountRepo.AddDefaultRoleToUser(new_user)).Succeeded)
                     {
                         return Ok(new_user);
                     }

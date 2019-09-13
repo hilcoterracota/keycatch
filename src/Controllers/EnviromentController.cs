@@ -1,7 +1,10 @@
 
 using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sampekey.Contex;
 using Sampekey.Interface;
 using Sampekey.Model.Configuration.Module;
 
@@ -12,7 +15,6 @@ namespace keycatch.Controllers
     public class EnviromentController : ControllerBase
     {
         private readonly IEnviroment enviroment;
-
         public EnviromentController(IEnviroment _enviroment)
         {
             enviroment = _enviroment;
@@ -20,37 +22,75 @@ namespace keycatch.Controllers
 
         [HttpGet]
         [Route("V1")]
-        public ActionResult<IEnumerable<Kingdom>> GetAllKingdoms()
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(IEnumerable<Kingdom>), (int)HttpStatusCode.OK)]
+        public ActionResult<Task<IEnumerable<Kingdom>>> GetAllKingdoms()
         {
-            return Ok(enviroment.GetAllKingdoms());
+            Task<IEnumerable<Kingdom>> data = enviroment.GetAllKingdoms();
+            if (data.IsCanceled) return BadRequest(data.Exception);
+            else if (data.Result == null) return NoContent();
+            else return Ok(data.Result);
         }
 
         [HttpGet]
-        [Route("V1/search")]
-        public ActionResult<Kingdom> FindKingdomById([FromBody] Kingdom value)
+        [Route("V1/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(Kingdom), (int)HttpStatusCode.OK)]
+        public ActionResult<Kingdom> FindKingdomById(string id)
         {
-            return Ok(enviroment.FindKingdomById(value));
+            Task<Kingdom> data = enviroment.FindKingdomById(id);
+            if (data.IsCanceled) return BadRequest(data.Exception);
+            else if (data.Result == null) return NoContent();
+            else return Ok(data.Result);
         }
 
         [HttpPost]
         [Route("V1")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(Kingdom), (int)HttpStatusCode.OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult<Kingdom> AddKingdom([FromBody] Kingdom value)
         {
-            return Ok(enviroment.AddKingdom(value));
+            Task<Kingdom> data = enviroment.AddKingdom(value);
+            if (data.IsCanceled) return BadRequest(data.Exception);
+            else if (data.Result == null) return NoContent();
+            else return Ok(data.Result);
         }
 
         [HttpPut]
         [Route("V1")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(Kingdom), (int)HttpStatusCode.OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult<Kingdom> UpdateKingdom([FromBody] Kingdom value)
         {
-            return Ok(enviroment.UpdateKingdom(value));
+            Task<Kingdom> data = enviroment.UpdateKingdom(value);
+            if (data.IsCanceled) return BadRequest(data.Exception);
+            else if (data.Result == null) return NoContent();
+            else return Ok(data.Result);
         }
 
+        /// <summary>
+        /// Deletes a specific TodoItem.
+        /// </summary>
+        /// <param name="id"></param>   
         [HttpDelete]
         [Route("V1")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult<bool> DeleteKingdom([FromBody] Kingdom value)
         {
-            return Ok(enviroment.DeleteKingdom(value));
+            Task<bool> data = enviroment.DeleteKingdom(value);
+            if (data.IsCanceled) return BadRequest(data.Exception);
+            else return Ok(data.Result);
         }
 
     }

@@ -10,9 +10,9 @@ namespace keycatch.Controllers
     [ApiController]
     public class EsrController : ControllerBase
     {
-        private readonly IKingdomCastleRolePermission kingdomCastleRolePermission;
+        private readonly IEsrp kingdomCastleRolePermission;
 
-        public EsrController(IKingdomCastleRolePermission _kingdomCastleRolePermission)
+        public EsrController(IEsrp _kingdomCastleRolePermission)
         {
             kingdomCastleRolePermission = _kingdomCastleRolePermission;
         }
@@ -25,10 +25,10 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        [Route("V1/search")]
-        public ActionResult<KingdomCastleRolePermission> FindKingdomCastleRolePermissionById([FromBody] KingdomCastleRolePermission value)
+        [Route("V1/{id}:string")]
+        public ActionResult<KingdomCastleRolePermission> FindKingdomCastleRolePermissionById(string id)
         {
-            return Ok(kingdomCastleRolePermission.FindKingdomCastleRolePermissionById(value));
+            return Ok(kingdomCastleRolePermission.FindKingdomCastleRolePermissionById(id));
         }
 
         [HttpPost]
