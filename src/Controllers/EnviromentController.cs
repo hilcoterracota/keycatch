@@ -76,10 +76,6 @@ namespace keycatch.Controllers
             else return Ok(data.Result);
         }
 
-        /// <summary>
-        /// Deletes a specific TodoItem.
-        /// </summary>
-        /// <param name="id"></param>   
         [HttpDelete]
         [Route("V1")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
