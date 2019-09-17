@@ -6,9 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Sampekey.Contex;
-using Sampekey.Model;
-using keycatch.Interfaces;
-using keycatch.Core;
+using Sampekey.Model.Identity;
+using Sampekey.Interface;
+using Sampekey.Interface.Repository;
+using System.Collections.Generic;
+using System.Linq;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 
 namespace keycatch
 {
@@ -34,14 +38,50 @@ namespace keycatch
             options.TokenValidationParameters = SampekeyParams.GetTokenValidationParameters());
             services.AddMvc().AddJsonOptions(ConfigureJson);
 
-            services.AddTransient<IAccountRepo, AccountRepo>();
-            services.AddTransient<IUserRepo, UserRepo>();
-            services.AddTransient<ISystemRepo, SystemRepo>();
-            services.AddTransient<IRoleRepo, RoleRepo>();
+            services.AddTransient<IAccount, AccountRepo>();
+            services.AddTransient<IEnviroment, EnviromentRepo>();
+            services.AddTransient<IEsrp, EsrpRepo>();
+            services.AddTransient<IModule, ModuleRepo>();
+            services.AddTransient<IPermission, PermissionRepo>();
+            services.AddTransient<IRole, RoleRepo>();
+            services.AddTransient<ISystem, SystemRepo>();
+            services.AddTransient<ISystemAlert, SystemAlertRepo>();
+            services.AddTransient<ISystemModule, SystemModuleRepo>();
+            services.AddTransient<IUser, UserRepo>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "KEYCATCH API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+                });
+            });
         }
-        
+
         private void ConfigureJson(MvcJsonOptions obj)
         {
             obj.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -60,7 +100,15 @@ namespace keycatch
                 app.UseHsts();
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
+
             //app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using keycatch.Interfaces;
+using Sampekey.Interface;
+using Sampekey.Model.Identity;
 using Sampekey.Contex;
-using Sampekey.Model;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace keycatch.Controllers
 {
@@ -15,27 +13,34 @@ namespace keycatch.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountRepo accountRepo;
-        private readonly IUserRepo userRepo;
-        private readonly IRoleRepo roleRepo;
-        private readonly ISystemRepo systemRepo;
+        private readonly IAccount accountRepo;
+        private readonly IUser userRepo;
+        private readonly IRole roleRepo;
+        private readonly ISystemAlert systemAlertRepo;
         public AccountController(
-            IAccountRepo _accountRepo,
-            IUserRepo _userRepo,
-            IRoleRepo _roleRepo,
-            ISystemRepo _systemRepo
+            IAccount _accountRepo,
+            IUser _userRepo,
+            IRole _roleRepo,
+            ISystemAlert _systemAlertRepo
         )
         {
             accountRepo = _accountRepo;
             userRepo = _userRepo;
             roleRepo = _roleRepo;
-            systemRepo = _systemRepo;
+            systemAlertRepo = _systemAlertRepo;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<object>> Get()
+        public ActionResult<IEnumerable<User>> Get()
         {
             return Ok(userRepo.GetAllUsers());
+        }
+
+        [HttpGet]
+        [Route("V1/GetUsersWithActiveDirectory")]
+        public HashSet<string> GetUsersWithActiveDirectory([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        {
+            return accountRepo.GetUsersWithActiveDirectory(userAccountRequest);
         }
 
         [HttpPost]
@@ -44,7 +49,7 @@ namespace keycatch.Controllers
         {
             if (ModelState.IsValid && accountRepo.LoginWithActiveDirectory(userAccountRequest))
             {
-                var user_found = await userRepo.FindUserByUserName(userAccountRequest);
+                var user_found = await accountRepo.FindUserByUserName(userAccountRequest);
                 if (user_found != null)
                 {
                     userAccountRequest.Email = user_found.Email;
@@ -58,15 +63,15 @@ namespace keycatch.Controllers
                 else
                 {
                     userAccountRequest.Email = $"{userAccountRequest.UserName}@{Environment.GetEnvironmentVariable("AD_DDOMAIN")}";
-                    if ((await userRepo.CreateUser(userAccountRequest)).Succeeded)
+                    if ((await accountRepo.CreateUser(userAccountRequest)).Succeeded)
                     {
-                        var new_user = await userRepo.FindUserByUserName(userAccountRequest);
-                        if ((await userRepo.AddDefaultRoleToUser(new_user)).Succeeded)
+                        var new_user = await accountRepo.FindUserByUserName(userAccountRequest);
+                        if ((await accountRepo.AddDefaultRoleToUser(new_user)).Succeeded)
                         {
                             return Ok(new
                             {
                                 User = new_user,
-                                Roles = userRepo.GetRolesFromUser(user_found),
+                                Roles = accountRepo.GetRolesFromUser(user_found),
                                 Token = SampekeyParams.CreateToken(userAccountRequest)
                             });
                         }
@@ -83,7 +88,7 @@ namespace keycatch.Controllers
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssageFromActiveDirectory());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssageFromActiveDirectory());
             }
         }
 
@@ -91,7 +96,7 @@ namespace keycatch.Controllers
         [Route("V1/LoginWithSampeKey")]
         public async Task<ActionResult<User>> LoginWithSampeKey([FromBody] SampekeyUserAccountRequest userAccountRequest)
         {
-            var user_found = await userRepo.FindUserByUserName(userAccountRequest);
+            var user_found = await accountRepo.FindUserByUserName(userAccountRequest);
 
             if (ModelState.IsValid && user_found != null)
             {
@@ -105,12 +110,12 @@ namespace keycatch.Controllers
                 }
                 else
                 {
-                    return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                    return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
                 }
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
             }
         }
 
@@ -120,10 +125,10 @@ namespace keycatch.Controllers
         {
             if (ModelState.IsValid)
             {
-                if ((await userRepo.CreateUser(userAccountRequest)).Succeeded)
+                if ((await accountRepo.CreateUser(userAccountRequest)).Succeeded)
                 {
-                    var new_user = await userRepo.FindUserByUserName(userAccountRequest);
-                    if ((await userRepo.AddDefaultRoleToUser(new_user)).Succeeded)
+                    var new_user = await accountRepo.FindUserByUserName(userAccountRequest);
+                    if ((await accountRepo.AddDefaultRoleToUser(new_user)).Succeeded)
                     {
                         return Ok(new_user);
                     }
@@ -156,7 +161,7 @@ namespace keycatch.Controllers
             }
             else
             {
-                return Unauthorized(systemRepo.GetUnauthorizedMenssage());
+                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
             }
         }
 
