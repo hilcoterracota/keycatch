@@ -25,7 +25,7 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        [Route("V1/{id}:string")]
+        [Route("V1/{id}")]
         public ActionResult<Permission> FindPermissionById(string id)
         {
             return Ok(permission.FindPermissionById(id));

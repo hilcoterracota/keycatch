@@ -25,7 +25,7 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        [Route("V1/{id}:string")]
+        [Route("V1/{id}")]
         public ActionResult<KingdomCastleRolePermission> FindKingdomCastleRolePermissionById(string id)
         {
             return Ok(kingdomCastleRolePermission.FindKingdomCastleRolePermissionById(id));

@@ -25,7 +25,7 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        [Route("V1/{id}:string")]
+        [Route("V1/{id}")]
         public ActionResult<User> FindUserById(string id)
         {
             return Ok(user.FindUserById(id));

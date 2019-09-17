@@ -26,7 +26,7 @@ namespace keycatch.Controllers
         }
 
         [HttpGet]
-        [Route("V1/{id}:string")]
+        [Route("V1/{id}")]
         public ActionResult<Land> FindLandById(string id)
         {
             return Ok(module.FindLandById(id));

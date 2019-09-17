@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Sampekey.Interface;
 using Sampekey.Model.Configuration.Module;
 
@@ -15,9 +16,11 @@ namespace keycatch.Controllers
     public class EnviromentController : ControllerBase
     {
         private readonly IEnviroment enviroment;
-        public EnviromentController(IEnviroment _enviroment)
+        private readonly ILogger logger;
+        public EnviromentController(IEnviroment _enviroment, ILogger<EnviromentController> _logger)
         {
             enviroment = _enviroment;
+            logger = _logger;
         }
 
         [HttpGet]
