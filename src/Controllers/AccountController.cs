@@ -1,11 +1,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Sampekey.Contex;
 using Sampekey.Interface;
 using Sampekey.Model.Identity;
-using Sampekey.Contex;
 
 namespace keycatch.Controllers
 {
@@ -13,157 +17,44 @@ namespace keycatch.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IAccount accountRepo;
-        private readonly IUser userRepo;
-        private readonly IRole roleRepo;
-        private readonly ISystemAlert systemAlertRepo;
-        public AccountController(
-            IAccount _accountRepo,
-            IUser _userRepo,
-            IRole _roleRepo,
-            ISystemAlert _systemAlertRepo
-        )
+        private readonly IAccount account;
+        private readonly ILogger logger;
+        public AccountController(IAccount _account, ILogger<AccountController> _logger)
         {
-            accountRepo = _accountRepo;
-            userRepo = _userRepo;
-            roleRepo = _roleRepo;
-            systemAlertRepo = _systemAlertRepo;
+            account = _account;
+            logger = _logger;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<User>> Get()
+        [HttpPost]
+        [Route("V1/login")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
+        public ActionResult<Task<string>> Login([FromBody] SampekeyUserAccountRequest value)
         {
-            return Ok(userRepo.GetAllUsers());
+            try
+            {
+                if (account.LoginWithActiveDirectory(value) || account.LoginWithSampeKey(value).IsCompleted){
+                    account.UpdateForcePaswordAsync(value);
+                    return Ok(SampekeyParams.CreateToken(value));
+                } else return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("V1/GetUsersWithActiveDirectory")]
-        public HashSet<string> GetUsersWithActiveDirectory([FromBody] SampekeyUserAccountRequest userAccountRequest)
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public ActionResult<HashSet<string>> GetUsersWithActiveDirectory([FromBody] SampekeyUserAccountRequest value)
         {
-            return accountRepo.GetUsersWithActiveDirectory(userAccountRequest);
+            HashSet<string> data = account.GetUsersWithActiveDirectory(value);
+            return Ok(data);
         }
-
-        [HttpPost]
-        [Route("V1/LoginWithActiveDirectory")]
-        public async Task<ActionResult<User>> LoginWithActiveDirectory([FromBody] SampekeyUserAccountRequest userAccountRequest)
-        {
-            if (ModelState.IsValid && accountRepo.LoginWithActiveDirectory(userAccountRequest))
-            {
-                var user_found = await accountRepo.FindUserByUserName(userAccountRequest);
-                if (user_found != null)
-                {
-                    userAccountRequest.Email = user_found.Email;
-                    await accountRepo.UpdateForcePaswordAsync(userAccountRequest);
-                    return Ok(new
-                    {
-                        User = user_found,
-                        Token = SampekeyParams.CreateToken(userAccountRequest)
-                    });
-                }
-                else
-                {
-                    userAccountRequest.Email = $"{userAccountRequest.UserName}@{Environment.GetEnvironmentVariable("AD_DDOMAIN")}";
-                    if ((await accountRepo.CreateUser(userAccountRequest)).Succeeded)
-                    {
-                        var new_user = await accountRepo.FindUserByUserName(userAccountRequest);
-                        if ((await accountRepo.AddDefaultRoleToUser(new_user)).Succeeded)
-                        {
-                            return Ok(new
-                            {
-                                User = new_user,
-                                Roles = accountRepo.GetRolesFromUser(user_found),
-                                Token = SampekeyParams.CreateToken(userAccountRequest)
-                            });
-                        }
-                        else
-                        {
-                            return ValidationProblem();
-                        }
-                    }
-                    else
-                    {
-                        return ValidationProblem();
-                    }
-                }
-            }
-            else
-            {
-                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssageFromActiveDirectory());
-            }
-        }
-
-        [HttpPost]
-        [Route("V1/LoginWithSampeKey")]
-        public async Task<ActionResult<User>> LoginWithSampeKey([FromBody] SampekeyUserAccountRequest userAccountRequest)
-        {
-            var user_found = await accountRepo.FindUserByUserName(userAccountRequest);
-
-            if (ModelState.IsValid && user_found != null)
-            {
-                if ((await accountRepo.LoginWithSampeKey(userAccountRequest)).Succeeded)
-                {
-                    return Ok(new
-                    {
-                        User = user_found,
-                        Token = SampekeyParams.CreateToken(userAccountRequest)
-                    });
-                }
-                else
-                {
-                    return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
-                }
-            }
-            else
-            {
-                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
-            }
-        }
-
-        [HttpPost]
-        [Route("V1/CreateUser")]
-        public async Task<ActionResult<User>> CreateUser([FromBody] SampekeyUserAccountRequest userAccountRequest)
-        {
-            if (ModelState.IsValid)
-            {
-                if ((await accountRepo.CreateUser(userAccountRequest)).Succeeded)
-                {
-                    var new_user = await accountRepo.FindUserByUserName(userAccountRequest);
-                    if ((await accountRepo.AddDefaultRoleToUser(new_user)).Succeeded)
-                    {
-                        return Ok(new_user);
-                    }
-                    else
-                    {
-                        return ValidationProblem();
-                    }
-                }
-                else
-                {
-                    return ValidationProblem();
-                }
-            }
-            else
-            {
-                return ValidationProblem();
-            }
-        }
-
-        [HttpPost]
-        [Route("V1/GeneratePermanentToken")]
-        public ActionResult<User> GeneratePermanentToken([FromBody] SampekeyUserAccountRequest userAccountRequest)
-        {
-            if (ModelState.IsValid)
-            {
-                return Ok(new
-                {
-                    Token = SampekeyParams.CreateToken(userAccountRequest)
-                });
-            }
-            else
-            {
-                return Unauthorized(systemAlertRepo.GetUnauthorizedMenssage());
-            }
-        }
-
     }
 }
