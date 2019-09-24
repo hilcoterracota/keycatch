@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace keycatch
 {
@@ -45,7 +46,6 @@ namespace keycatch
             services.AddTransient<IPermission, PermissionRepo>();
             services.AddTransient<IRole, RoleRepo>();
             services.AddTransient<ISystem, SystemRepo>();
-            services.AddTransient<ISystemAlert, SystemAlertRepo>();
             services.AddTransient<ISystemModule, SystemModuleRepo>();
             services.AddTransient<IUser, UserRepo>();
 

@@ -54,7 +54,7 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(CastleLand), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(CastleLand), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult<CastleLand> AddCastleLand([FromBody] CastleLand value)
         {
