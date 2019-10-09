@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -31,13 +30,18 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
-        public ActionResult<Task<string>> Login([FromBody] SampekeyUserAccountRequest value)
+        public async Task<ActionResult<object>> LoginAsync([FromBody] SampekeyUserAccountRequest value)
         {
             try
             {
+                return Ok(new{
+                    data = await account.Login(value)
+                });
+                /**
                 if (account.LoginWithActiveDirectory(value).IsCompleted || account.LoginWithSampeKey(value).IsCompleted){
                     return Ok(SampekeyParams.CreateToken(value));
                 } else return NoContent();
+                */
             }
             catch (Exception ex)
             {
