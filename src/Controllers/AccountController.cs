@@ -28,25 +28,13 @@ namespace keycatch.Controllers
         [HttpPost]
         [Route("V1/login")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<object>> LoginAsync([FromBody] SampekeyUserAccountRequest value)
         {
-            try
-            {
-                return Ok(new{
-                    data = await account.Login(value)
-                });
-                /**
-                if (account.LoginWithActiveDirectory(value).IsCompleted || account.LoginWithSampeKey(value).IsCompleted){
-                    return Ok(SampekeyParams.CreateToken(value));
-                } else return NoContent();
-                */
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            var data = await account.Login(value);
+            if (data) return Ok(new{Token = SampekeyParams.CreateToken(value)});
+            else return Unauthorized();
         }
 
         [HttpPost]
@@ -73,6 +61,16 @@ namespace keycatch.Controllers
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
+        }
+
+        [HttpGet]
+        [Route("V1/GetStatusSession")]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public ActionResult GetStatusSession()
+        {
+            return Ok();
         }
     }
 }
