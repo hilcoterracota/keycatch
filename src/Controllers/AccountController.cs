@@ -66,7 +66,7 @@ namespace keycatch.Controllers
         [HttpGet]
         [Route("V1/GetStatusSession")]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ActionResult), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult GetStatusSession()
         {
