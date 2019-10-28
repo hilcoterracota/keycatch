@@ -7,7 +7,8 @@ WORKDIR /src
 COPY ["keycatch.csproj", ""]
 RUN dotnet restore "keycatch.csproj"
 COPY . .
-WORKDIR "/src/"
+
+WORKDIR /src
 RUN dotnet build "*.csproj" -c Release -o /app
  
 FROM build AS publish
