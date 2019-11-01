@@ -1,20 +1,16 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-stretch-slim AS base
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-env
 WORKDIR /app
-EXPOSE 80
- 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
-WORKDIR /src
-COPY ["keycatch.csproj", ""]
-RUN dotnet restore "keycatch.csproj"
-COPY . .
 
-WORKDIR /src
-RUN dotnet build "*.csproj" -c Release -o /app
- 
-FROM build AS publish
-RUN dotnet publish "keycatch.csproj" -c Release -o /app
- 
-FROM base AS final
+# Copy csproj and restore as distinct layers
+COPY src/*.csproj ./
+RUN dotnet restore
+
+# Copy everything else and build
+COPY src/ ./
+RUN dotnet publish -c Release -o out
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "keycatch.dll"]
