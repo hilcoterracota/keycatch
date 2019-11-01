@@ -46,9 +46,16 @@ namespace keycatch
             services.AddTransient<ISystemModule, SystemModuleRepo>();
             services.AddTransient<IUser, UserRepo>();
 
-            services.AddCors();
+            services.AddCors(options => {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                );
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "KEYCATCH API", Version = "v1" });
@@ -105,12 +112,7 @@ namespace keycatch
                 c.RoutePrefix = string.Empty;
             });
 
-            app.UseCors(builder => builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials()
-            );
+            app.UseCors("CorsPolicy");
 
             //app.UseHttpsRedirection();
 

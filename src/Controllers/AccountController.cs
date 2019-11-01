@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Novell.Directory.Ldap;
 using Sampekey.Contex;
 using Sampekey.Interface;
 using Sampekey.Model.Identity;
@@ -33,7 +34,7 @@ namespace keycatch.Controllers
         public async Task<ActionResult<object>> LoginAsync([FromBody] SampekeyUserAccountRequest value)
         {
             var data = await account.Login(value);
-            if (data) return Ok(new{Token = SampekeyParams.CreateToken(value)});
+            if (data) return Ok(new { Token = SampekeyParams.CreateToken(value) });
             else return Unauthorized();
         }
 
@@ -43,10 +44,57 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<HashSet<string>> GetUsersWithActiveDirectory([FromBody] SampekeyUserAccountRequest value)
+        public ActionResult<HashSet<object>> GetUsersWithActiveDirectory([FromBody] SampekeyUserAccountRequest value)
         {
+            var users = new HashSet<object>();
+            try
+            {
+                using (var connection = new LdapConnection { SecureSocketLayer = false })
+                {
+                    var _domain = Environment.GetEnvironmentVariable("AD_DDOMAIN");
+                    var _domainServer = Environment.GetEnvironmentVariable("AD_DDOMAIN_SSERVER");
+                    var _port = Environment.GetEnvironmentVariable("AD_PORT");
+
+                    connection.Connect(_domainServer, int.Parse(_port));
+                    connection.Bind($"{value.UserName}@{_domain}", value.Password);
+                    
+                    LdapSearchResults searchResults = connection.Search(
+                        Environment.GetEnvironmentVariable("BIND_DN"),
+                        LdapConnection.SCOPE_SUB,
+                        Environment.GetEnvironmentVariable("LDAP_FILTER"),
+                        null,
+                        false
+                    );
+
+                    while (searchResults.hasMore())
+                    {
+                        LdapEntry nextEntry = null;
+                        nextEntry = searchResults.next();
+                        nextEntry.getAttributeSet();
+                        var attr = nextEntry.getAttribute("mail");
+                        if (attr == null)
+                        {
+                            users.Add(nextEntry.getAttribute("distinguishedName").StringValue);
+                        }
+                        else
+                        {
+                            users.Add(new{
+                                Email = nextEntry.getAttribute("mail").StringValue,
+                                UserName = "salnmfla"
+                            });
+                        }
+                    }
+                    return users;
+                }
+            }
+            catch
+            {
+                return users;
+            }
+            /*
             HashSet<string> data = account.GetUsersWithActiveDirectory(value);
             return Ok(data);
+            */
         }
 
         [HttpPost]
