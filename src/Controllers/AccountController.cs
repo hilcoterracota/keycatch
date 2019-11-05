@@ -80,7 +80,7 @@ namespace keycatch.Controllers
                         {
                             users.Add(new{
                                 Email = nextEntry.getAttribute("mail").StringValue,
-                                UserName = "salnmfla"
+                                UserName = nextEntry.getAttribute("sAMAccountName").StringValue
                             });
                         }
                     }
