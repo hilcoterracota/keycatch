@@ -39,6 +39,16 @@ namespace keycatch.Controllers
         }
 
         [HttpPost]
+        [Route("V1/GenerateNewToken")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
+        public ActionResult<object> GenerateNewToken([FromBody] SampekeyUserAccountRequest value)
+        {
+            return Ok(new { Token = SampekeyParams.CreateToken(value) });
+        }
+
+        [HttpPost]
         [Route("V1/GetUsersWithActiveDirectory")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
