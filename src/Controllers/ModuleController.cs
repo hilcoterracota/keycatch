@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sampekey.Interface;
-using Sampekey.Model.Configuration.Module;
+using Sampekey.Model.Configuration.Quid;
 
 namespace keycatch.Controllers
 {
@@ -27,10 +27,10 @@ namespace keycatch.Controllers
         [Route("V1")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(IEnumerable<Land>), (int)HttpStatusCode.OK)]
-        public ActionResult<Task<IEnumerable<Land>>> GetAllLands()
+        [ProducesResponseType(typeof(IEnumerable<Module>), (int)HttpStatusCode.OK)]
+        public ActionResult<Task<IEnumerable<Module>>> GetAllModules()
         {
-            Task<IEnumerable<Land>> data = module.GetAllLands();
+            Task<IEnumerable<Module>> data = module.GetAllModules();
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -40,10 +40,10 @@ namespace keycatch.Controllers
         [Route("V1/{id}")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(Land), (int)HttpStatusCode.OK)]
-        public ActionResult<Land> FindLandById(string id)
+        [ProducesResponseType(typeof(Module), (int)HttpStatusCode.OK)]
+        public ActionResult<Module> FindModuleById(string id)
         {
-            Task<Land> data = module.FindLandById(id);
+            Task<Module> data = module.FindModuleById(id);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -54,11 +54,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(Land), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Module), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<Land> AddLand([FromBody] Land value)
+        public ActionResult<Module> AddModule([FromBody] Module value)
         {
-            Task<Land> data = module.AddLand(value);
+            Task<Module> data = module.AddModule(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -69,11 +69,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(Land), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Module), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<Land> UpdateLand([FromBody] Land value)
+        public ActionResult<Module> UpdateModule([FromBody] Module value)
         {
-            Task<Land> data = module.UpdateLand(value);
+            Task<Module> data = module.UpdateModule(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -85,9 +85,9 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<bool> DeleteLand([FromBody] Land value)
+        public ActionResult<bool> DeleteModule([FromBody] Module value)
         {
-            Task<bool> data = module.DeleteLand(value);
+            Task<bool> data = module.DeleteModule(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else return Ok(data.Result);
         }

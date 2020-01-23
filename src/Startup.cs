@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Sampekey.Contex;
-using Sampekey.Model.Identity;
 using Sampekey.Interface;
 using Sampekey.Interface.Repository;
-using System.Collections.Generic;
-using Microsoft.OpenApi.Models;
+using Sampekey.Model.Identity;
 
 namespace keycatch
 {
@@ -34,7 +35,7 @@ namespace keycatch
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             options.TokenValidationParameters = SampekeyParams.GetTokenValidationParameters());
-            services.AddMvc().AddJsonOptions(ConfigureJson);
+            services.AddMvc();
 
             services.AddTransient<IAccount, AccountRepo>();
             services.AddTransient<IEnviroment, EnviromentRepo>();
@@ -54,7 +55,7 @@ namespace keycatch
                 );
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddSwaggerGen(c =>
             {
@@ -87,13 +88,9 @@ namespace keycatch
             });
         }
 
-        private void ConfigureJson(MvcJsonOptions obj)
-        {
-            obj.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -114,8 +111,7 @@ namespace keycatch
 
             app.UseCors("CorsPolicy");
 
-            //app.UseHttpsRedirection();
-
+            app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
         }

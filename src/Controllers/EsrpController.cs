@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sampekey.Interface;
-using Sampekey.Model.Configuration.Module;
+using Sampekey.Model.Configuration.Breakers;
+using Sampekey.Model.Configuration.Quid;
 
 namespace keycatch.Controllers
 {
@@ -28,10 +29,10 @@ namespace keycatch.Controllers
         [Route("V1")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(IEnumerable<KingdomCastleRolePermission>), (int)HttpStatusCode.OK)]
-        public ActionResult<IEnumerable<KingdomCastleRolePermission>> GetAllKingdomCastleRolePermissionsAsync()
+        [ProducesResponseType(typeof(IEnumerable<EnviromentProjectRolePermission>), (int)HttpStatusCode.OK)]
+        public ActionResult<IEnumerable<EnviromentProjectRolePermission>> GetAllEnviromentProjectRolePermissionsAsync()
         {
-            Task<IEnumerable<KingdomCastleRolePermission>> data = esrp.GetAllKingdomCastleRolePermissions();
+            Task<IEnumerable<EnviromentProjectRolePermission>> data = esrp.GetAllEnviromentProjectRolePermissions();
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -41,10 +42,10 @@ namespace keycatch.Controllers
         [Route("V1/{id}")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(Kingdom), (int)HttpStatusCode.OK)]
-        public ActionResult<KingdomCastleRolePermission> FindKingdomCastleRolePermissionById(string id)
+        [ProducesResponseType(typeof(Enviroment), (int)HttpStatusCode.OK)]
+        public ActionResult<EnviromentProjectRolePermission> FindEnviromentProjectRolePermissionById(string id)
         {
-            Task<KingdomCastleRolePermission> data = esrp.FindKingdomCastleRolePermissionById(id);
+            Task<EnviromentProjectRolePermission> data = esrp.FindEnviromentProjectRolePermissionById(id);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -55,11 +56,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(Kingdom), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Enviroment), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<KingdomCastleRolePermission> AddKingdomCastleRolePermission([FromBody] KingdomCastleRolePermission value)
+        public ActionResult<EnviromentProjectRolePermission> AddEnviromentProjectRolePermission([FromBody] EnviromentProjectRolePermission value)
         {
-            Task<KingdomCastleRolePermission> data = esrp.AddKingdomCastleRolePermission(value);
+            Task<EnviromentProjectRolePermission> data = esrp.AddEnviromentProjectRolePermission(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -70,11 +71,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(Kingdom), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Enviroment), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<KingdomCastleRolePermission> UpdateKingdomCastleRolePermission([FromBody] KingdomCastleRolePermission value)
+        public ActionResult<EnviromentProjectRolePermission> UpdateEnviromentProjectRolePermission([FromBody] EnviromentProjectRolePermission value)
         {
-            Task<KingdomCastleRolePermission> data = esrp.UpdateKingdomCastleRolePermission(value);
+            Task<EnviromentProjectRolePermission> data = esrp.UpdateEnviromentProjectRolePermission(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -86,9 +87,9 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<bool> DeleteKingdomCastleRolePermission([FromBody] KingdomCastleRolePermission value)
+        public ActionResult<bool> DeleteEnviromentProjectRolePermission([FromBody] EnviromentProjectRolePermission value)
         {
-            Task<bool> data = esrp.DeleteKingdomCastleRolePermission(value);
+            Task<bool> data = esrp.DeleteEnviromentProjectRolePermission(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else return Ok(data.Result);
         }

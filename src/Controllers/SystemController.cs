@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sampekey.Interface;
-using Sampekey.Model.Configuration.Module;
+using Sampekey.Model.Configuration.Quid;
 
 namespace keycatch.Controllers
 {
@@ -27,10 +27,10 @@ namespace keycatch.Controllers
         [Route("V1")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(IEnumerable<Castle>), (int)HttpStatusCode.OK)]
-        public ActionResult<Task<IEnumerable<Castle>>> GetAllCastles()
+        [ProducesResponseType(typeof(IEnumerable<Project>), (int)HttpStatusCode.OK)]
+        public ActionResult<Task<IEnumerable<Project>>> GetAllProjects()
         {
-            Task<IEnumerable<Castle>> data = system.GetAllCastles();
+            Task<IEnumerable<Project>> data = system.GetAllProjects();
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -40,10 +40,10 @@ namespace keycatch.Controllers
         [Route("V1/{id}")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(Castle), (int)HttpStatusCode.OK)]
-        public ActionResult<Castle> FindCastleById(string id)
+        [ProducesResponseType(typeof(Project), (int)HttpStatusCode.OK)]
+        public ActionResult<Project> FindProjectById(string id)
         {
-            Task<Castle> data = system.FindCastleById(id);
+            Task<Project> data = system.FindProjectById(id);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -54,11 +54,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(Castle), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Project), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<Castle> AddCastle([FromBody] Castle value)
+        public ActionResult<Project> AddProject([FromBody] Project value)
         {
-            Task<Castle> data = system.AddCastle(value);
+            Task<Project> data = system.AddProject(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -69,11 +69,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(Castle), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Project), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<Castle> UpdateCastle([FromBody] Castle value)
+        public ActionResult<Project> UpdateProject([FromBody] Project value)
         {
-            Task<Castle> data = system.UpdateCastle(value);
+            Task<Project> data = system.UpdateProject(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -85,9 +85,9 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<bool> DeleteCastle([FromBody] Castle value)
+        public ActionResult<bool> DeleteProject([FromBody] Project value)
         {
-            Task<bool> data = system.DeleteCastle(value);
+            Task<bool> data = system.DeleteProject(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else return Ok(data.Result);
         }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sampekey.Interface;
-using Sampekey.Model.Configuration.Module;
+using Sampekey.Model.Configuration.Breakers;
 
 namespace keycatch.Controllers
 {
@@ -27,10 +27,10 @@ namespace keycatch.Controllers
         [Route("V1")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(IEnumerable<CastleLand>), (int)HttpStatusCode.OK)]
-        public ActionResult<Task<IEnumerable<CastleLand>>> GetAllCastleLands()
+        [ProducesResponseType(typeof(IEnumerable<ProjectModule>), (int)HttpStatusCode.OK)]
+        public ActionResult<Task<IEnumerable<ProjectModule>>> GetAllProjectModules()
         {
-            Task<IEnumerable<CastleLand>> data = systemModule.GetAllCastleLands();
+            Task<IEnumerable<ProjectModule>> data = systemModule.GetAllProjectModules();
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -40,10 +40,10 @@ namespace keycatch.Controllers
         [Route("V1/{id}")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType(typeof(CastleLand), (int)HttpStatusCode.OK)]
-        public ActionResult<CastleLand> FindCastleLandById(string id)
+        [ProducesResponseType(typeof(ProjectModule), (int)HttpStatusCode.OK)]
+        public ActionResult<ProjectModule> FindProjectModuleById(string id)
         {
-            Task<CastleLand> data = systemModule.FindCastleLandById(id);
+            Task<ProjectModule> data = systemModule.FindProjectModuleById(id);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -54,11 +54,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        //[ProducesResponseType(typeof(CastleLand), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(ProjectModule), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<CastleLand> AddCastleLand([FromBody] CastleLand value)
+        public ActionResult<ProjectModule> AddProjectModule([FromBody] ProjectModule value)
         {
-            Task<CastleLand> data = systemModule.AddCastleLand(value);
+            Task<ProjectModule> data = systemModule.AddProjectModule(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -69,11 +69,11 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(CastleLand), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProjectModule), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<CastleLand> UpdateCastleLand([FromBody] CastleLand value)
+        public ActionResult<ProjectModule> UpdateProjectModule([FromBody] ProjectModule value)
         {
-            Task<CastleLand> data = systemModule.UpdateCastleLand(value);
+            Task<ProjectModule> data = systemModule.UpdateProjectModule(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else if (data.Result == null) return NoContent();
             else return Ok(data.Result);
@@ -85,9 +85,9 @@ namespace keycatch.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<bool> DeleteCastleLand([FromBody] CastleLand value)
+        public ActionResult<bool> DeleteProjectModule([FromBody] ProjectModule value)
         {
-            Task<bool> data = systemModule.DeleteCastleLand(value);
+            Task<bool> data = systemModule.DeleteProjectModule(value);
             if (data.IsCanceled) return BadRequest(data.Exception);
             else return Ok(data.Result);
         }
