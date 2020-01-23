@@ -27,6 +27,8 @@ namespace keycatch
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.AddDbContext<SampekeyDbContex>();
 
             services.AddIdentity<User, Role>()
@@ -35,7 +37,6 @@ namespace keycatch
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             options.TokenValidationParameters = SampekeyParams.GetTokenValidationParameters());
-            services.AddMvc();
 
             services.AddTransient<IAccount, AccountRepo>();
             services.AddTransient<IEnviroment, EnviromentRepo>();
@@ -54,8 +55,6 @@ namespace keycatch
                     .AllowAnyHeader()
                 );
             });
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddSwaggerGen(c =>
             {
@@ -92,14 +91,9 @@ namespace keycatch
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+           if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
             }
 
             app.UseSwagger();
@@ -108,12 +102,15 @@ namespace keycatch
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
-
             app.UseCors("CorsPolicy");
 
-            app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseMvc();
+           // app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }
