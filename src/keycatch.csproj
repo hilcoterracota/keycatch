@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.6" />
-    <PackageReference Include="Sampekey" Version="1.5.1" />
+    <PackageReference Include="Sampekey" Version="1.5.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
   </ItemGroup>
 
